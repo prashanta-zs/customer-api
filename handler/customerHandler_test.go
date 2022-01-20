@@ -23,7 +23,7 @@ func TestGetCustomerById(t *testing.T) {
 	}
 	for _, tc := range test {
 		t.Run(tc.Name, func(t *testing.T) {
-			request, _ := http.NewRequest(http.MethodGet, "/customer/"+fmt.Sprint(tc.Id), nil)
+			request, _ := http.NewRequest(http.MethodGet, "/customer/", nil)
 			request = mux.SetURLVars(request, map[string]string{"id": fmt.Sprint(tc.Id)})
 			response := httptest.NewRecorder()
 
@@ -76,6 +76,30 @@ func TestUpdateCustomer(t *testing.T) {
 		response := httptest.NewRecorder()
 
 		UpdateCustomer(response, request)
+		got := response.Result()
+
+		if got.StatusCode != tc.statusCode {
+			t.Errorf("[TEST%d]Failed. Got %v\tExpected %v\n", i, got.StatusCode, tc.statusCode)
+		}
+	}
+}
+
+func TestDeleteCustomerDetails(t *testing.T) {
+	test := []struct {
+		desc       string
+		statusCode int
+		id         int
+	}{
+		{"Deleted Successfully", http.StatusOK, 8},
+	}
+
+	for i, tc := range test {
+		request := httptest.NewRequest("DELETE", "/customer/delete", nil)
+		request = mux.SetURLVars(request, map[string]string{"id": fmt.Sprint(tc.id)})
+		response := httptest.NewRecorder()
+
+		DeleteCustomerDetails(response, request)
+
 		got := response.Result()
 
 		if got.StatusCode != tc.statusCode {

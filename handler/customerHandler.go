@@ -22,18 +22,25 @@ type Customers struct {
 
 //GetAllCustomers using GET Method
 func GetAllCustomers(w http.ResponseWriter, r *http.Request) {
+
 	w.Header().Set("Content-Type", "application-Json")
 	Db, err := sql.Open("mysql", "root:maji815355@tcp(127.0.0.1:3306)/assignment")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer Db.Close()
+
 	var c []Customers
+
 	res, err := Db.Query("SELECT * FROM CUSTOMER")
+
 	defer res.Close()
+
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	for res.Next() {
 
 		var customer Customers
@@ -44,28 +51,35 @@ func GetAllCustomers(w http.ResponseWriter, r *http.Request) {
 		c = append(c, customer)
 		//w.WriteHeader(http.StatusBadRequest)
 	}
+
 	CustJson, _ := json.Marshal(c)
 	w.Write(CustJson)
-
 }
 
 //GetCustomerById using GET method
 func GetCustomerById(w http.ResponseWriter, r *http.Request) {
+
 	Db, err := sql.Open("mysql", "root:maji815355@tcp(127.0.0.1:3306)/assignment")
+
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer Db.Close()
+
 	params := mux.Vars(r)
 	v := params["id"]
 	id, _ := strconv.Atoi(v)
 
 	res, err := Db.Query("SELECT * FROM CUSTOMER WHERE id = ?", id)
 	defer res.Close()
+
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	var customer Customers
+
 	for res.Next() {
 
 		err := res.Scan(&customer.Id, &customer.Name, &customer.Phone, &customer.Address)
@@ -82,16 +96,22 @@ func GetCustomerById(w http.ResponseWriter, r *http.Request) {
 
 //AddCustomer using POST method
 func AddCustomer(w http.ResponseWriter, r *http.Request) {
+
 	Db, err := sql.Open("mysql", "root:maji815355@tcp(127.0.0.1:3306)/assignment")
+
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer Db.Close()
+
 	var person Customers
+
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	err = json.Unmarshal(requestBody, &person)
 	if err != nil {
 		log.Fatal(err)
@@ -106,10 +126,13 @@ func AddCustomer(w http.ResponseWriter, r *http.Request) {
 
 //UpdateCustomer using PUT method
 func UpdateCustomer(w http.ResponseWriter, r *http.Request) {
+
 	Db, err := sql.Open("mysql", "root:maji815355@tcp(127.0.0.1:3306)/assignment")
+
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer Db.Close()
 
 	param := mux.Vars(r)
@@ -120,6 +143,7 @@ func UpdateCustomer(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	var c Customers
 	json.Unmarshal(requestBody, &c)
 
@@ -134,11 +158,14 @@ func UpdateCustomer(w http.ResponseWriter, r *http.Request) {
 
 //DeleteCustomerDetails using DELETE method
 func DeleteCustomerDetails(w http.ResponseWriter, r *http.Request) {
+
 	Db, err := sql.Open("mysql", "root:maji815355@tcp(127.0.0.1:3306)/assignment")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer Db.Close()
+
 	params := mux.Vars(r)
 	v := params["id"]
 	id, _ := strconv.Atoi(v)
